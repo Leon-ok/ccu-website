@@ -1,0 +1,12 @@
+{
+  "name": "roblox-ccu-tracker",
+  "version": "1.0.0",
+  "description": "Tracks Roblox CCU and visits for specified games",
+  "main": "scripts/fetch_data.js",
+  "scripts": {
+    "start": "node scripts/fetch_data.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.5"
+  }
+}

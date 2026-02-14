@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Game Statistics</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Roblox Games Stats</h1>
+            <div class="stats-summary">
+                <div class="stat-card total-ccu">
+                    <h2>Total Active Players</h2>
+                    <p id="total-playing">Loading...</p>
+                </div>
+                <div class="stat-card total-visits">
+                    <h2>Total Visits</h2>
+                    <p id="total-visits">Loading...</p>
+                </div>
+            </div>
+            <p class="last-updated">Last Updated: <span id="last-updated">...</span></p>
+        </header>
+
+        <main id="games-grid">
+            <!-- Game cards will be injected here -->
+        </main>
+
+        <footer>
+            <p>Data updates automatically via GitHub Actions</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
