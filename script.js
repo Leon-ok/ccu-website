@@ -52,14 +52,14 @@ async function fetchPlaceIds() {
 
 async function fetchPlaceDetails(placeIds) {
     const query = placeIds.join(',');
-    const response = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${query}`);
+    const response = await fetch(`https://games.rotunnel.com/v1/games/multiget-place-details?placeIds=${query}`);
     if (!response.ok) throw new Error('Failed to fetch place details');
     return response.json();
 }
 
 async function fetchGameStats(universeIds) {
     const query = universeIds.join(',');
-    const response = await fetch(`https://games.roblox.com/v1/games?universeIds=${query}`);
+    const response = await fetch(`https://games.rotunnel.com/v1/games?universeIds=${query}`);
     if (!response.ok) throw new Error('Failed to fetch game stats');
     const json = await response.json();
     return json.data;
@@ -67,7 +67,7 @@ async function fetchGameStats(universeIds) {
 
 async function fetchThumbnails(universeIds) {
     const query = universeIds.join(',');
-    const response = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${query}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`);
+    const response = await fetch(`https://thumbnails.rotunnel.com/v1/games/icons?universeIds=${query}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`);
     if (!response.ok) throw new Error('Failed to fetch thumbnails');
     const json = await response.json();
     return json.data;
