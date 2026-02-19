@@ -1,20 +1,86 @@
-// This script handles fetching the data.json and updating the UI
-
 document.addEventListener('DOMContentLoaded', () => {
-    fetchData();
+    fetchLiveData();
 });
 
-async function fetchData() {
+async function fetchLiveData() {
     try {
-        // Add a timestamp to prevent caching
+        const placeIds = await fetchPlaceIds();
+        if (!placeIds || placeIds.length === 0) throw new Error('No place IDs found');
+
+        const placeDetails = await fetchPlaceDetails(placeIds);
+        const universeIds = placeDetails.map(p => p.universeId);
+        const universeIdToPlaceId = Object.fromEntries(placeDetails.map(p => [p.universeId, p.placeId]));
+
+        const [gamesData, thumbnailsData] = await Promise.all([
+            fetchGameStats(universeIds),
+            fetchThumbnails(universeIds),
+        ]);
+
+        const thumbnailsMap = Object.fromEntries(thumbnailsData.map(t => [t.targetId, t.imageUrl]));
+
+        let totalPlaying = 0;
+        let totalVisits = 0;
+
+        const games = gamesData.map(game => {
+            totalPlaying += game.playing || 0;
+            totalVisits += game.visits || 0;
+            return {
+                id: game.id,
+                placeId: universeIdToPlaceId[game.id],
+                name: game.name,
+                playing: game.playing || 0,
+                visits: game.visits || 0,
+                thumbnailUrl: thumbnailsMap[game.id],
+                description: game.description,
+            };
+        });
+
+        games.sort((a, b) => b.playing - a.playing);
+
+        updateUI({ lastUpdated: new Date().toISOString(), totalPlaying, totalVisits, games });
+    } catch (error) {
+        console.warn('Live fetch failed, falling back to cached data:', error);
+        fetchCachedData();
+    }
+}
+
+async function fetchPlaceIds() {
+    const response = await fetch('games.json');
+    if (!response.ok) throw new Error('Failed to load games.json');
+    return response.json();
+}
+
+async function fetchPlaceDetails(placeIds) {
+    const query = placeIds.join(',');
+    const response = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${query}`);
+    if (!response.ok) throw new Error('Failed to fetch place details');
+    return response.json();
+}
+
+async function fetchGameStats(universeIds) {
+    const query = universeIds.join(',');
+    const response = await fetch(`https://games.roblox.com/v1/games?universeIds=${query}`);
+    if (!response.ok) throw new Error('Failed to fetch game stats');
+    const json = await response.json();
+    return json.data;
+}
+
+async function fetchThumbnails(universeIds) {
+    const query = universeIds.join(',');
+    const response = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${query}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`);
+    if (!response.ok) throw new Error('Failed to fetch thumbnails');
+    const json = await response.json();
+    return json.data;
+}
+
+async function fetchCachedData() {
+    try {
         const response = await fetch('data.json?t=' + new Date().getTime());
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Cached data not available');
         const data = await response.json();
         updateUI(data);
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching cached data:', error);
         document.getElementById('total-playing').innerText = 'Error';
         document.getElementById('total-visits').innerText = 'Error';
     }
